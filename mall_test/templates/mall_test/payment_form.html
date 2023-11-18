@@ -1,0 +1,28 @@
+{% extends "mall_test/base.html" %} {% block content %}
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
+<h2>결제하기</h2>
+
+<script>
+  (function () {
+    // IAMPORT 초기화
+    const IMP = window.IMP;
+    const code = "iamport";
+    IMP.init(code); // 요청 식별 코드 동적으로 생성 (매번 다르게 보내야 함)
+
+    const merchant_uid = "merchant_" + new Date().getTime(); // 결제 요청 테스트 함수 // merchant_uid, name, amount
+
+    IMP.request_pay(
+      {
+        merchant_uid: merchant_uid,
+        name: "주문 테스트",
+        amount: 100,
+      },
+      function (response) {
+        console.log(response); // 결제 내역 정보를 callback 의 인자 response 로 받음
+      }
+    );
+  })();
+</script>
+
+{% endblock %}
