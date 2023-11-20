@@ -6,8 +6,8 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("accounts/", include("accounts.urls")),
-    path("mall_test/", include("mall_test.urls")),
+    path("api/v1/accounts/", include("accounts.urls")),
+    path("api/v1/mall_test/", include("mall_test.urls")),
 ]
 
 if settings.DEBUG:

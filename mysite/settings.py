@@ -50,12 +50,14 @@ INSTALLED_APPS = [
     "django_bootstrap5",
     "rest_framework",
     "rest_framework_simplejwt",
+    "corsheaders",
     # local apps
     "accounts",
     "mall_test",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -177,3 +179,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "accounts.User"
 
 INTERNAL_IPS = ["127.0.0.1"]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:3010",  # 허용할 origin 추가 (프론트엔드 주소)
+]
+CORS_ALLOW_CREDENTIALS = True

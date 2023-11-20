@@ -16,12 +16,26 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
-
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .models import User
+from .serializers import UserSerializer
 
-# 로그인에 필요한 import end
-User = get_user_model()
+
+class ListViewForUser(APIView):
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateViewForUser(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def template_test(request):
@@ -32,6 +46,10 @@ def template_test(request):
 
     # 템플릿 렌더링 및 HTTP 응답 반환
     return render(request, "accounts/my_template.html", context)
+
+
+# 로그인에 필요한 import end
+User = get_user_model()
 
 
 class LoginView(APIView):
@@ -58,13 +76,7 @@ class LoginView(APIView):
                 status=400,
             )
 
-        user = authenticate(
-            request,
-            username=username,
-            password=password,
-        )
-
-        if user:
+        if user := authenticate(request, username=username, password=password):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
 

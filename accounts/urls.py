@@ -3,7 +3,8 @@ from . import views
 
 
 urlpatterns = [
-    # URL 패턴들을 여기에 추가
+    path("user", views.ListViewForUser.as_view()),
+    path("user/create", views.CreateViewForUser.as_view()),
     path("test", views.template_test),
     path("login", views.LoginView.as_view()),
     path("logout", views.LogoutView.as_view()),
