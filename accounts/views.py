@@ -17,35 +17,34 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from .models import User
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import UserSerializer
 
 
-class ListViewForUser(APIView):
+class LoginCheckView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        user = request.user
 
-
-class CreateViewForUser(APIView):
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-def template_test(request):
-    # 컨텍스트 변수
-    context = {
-        "message": "안녕하세요, Django!",
-    }
-
-    # 템플릿 렌더링 및 HTTP 응답 반환
-    return render(request, "accounts/my_template.html", context)
+        if user.is_authenticated:
+            serialized_user = UserSerializer(user).data
+            return Response(
+                {
+                    "status": "success",
+                    "message": "login check success!",
+                    "user_info": serialized_user,
+                }
+            )
+        else:
+            return Response(
+                {
+                    "status": "fail",
+                    "message": "you are not loggedIn",
+                }
+            )
 
 
 # 로그인에 필요한 import end
@@ -105,14 +104,27 @@ class LogoutView(APIView):
         return Response({"logout_success": True})
 
 
-class CheckViewForLogin(APIView):
+class ListViewForUser(APIView):
     def get(self, request):
-        print("request.user : ", request.user)
-        if not request.user.is_authenticated:
-            return Response(
-                {"message": "로그인이 필요합니다.", "status": "is_not_authenticated"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-        print("user : ", request.user)
-        # serializer = UserProfileSerializer(user)
-        return Response({"message": "login success"}, status=status.HTTP_200_OK)
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateViewForUser(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def template_test(request):
+    # 컨텍스트 변수
+    context = {
+        "message": "안녕하세요, Django!",
+    }
+
+    # 템플릿 렌더링 및 HTTP 응답 반환
+    return render(request, "accounts/my_template.html", context)
